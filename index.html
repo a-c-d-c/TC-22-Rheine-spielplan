@@ -936,7 +936,15 @@ async function loadAllData() {
     }
   }
 
-  await Promise.allSettled(LEAGUES.map(league => loadLeague(league, 1)));
+  /* Max. 3 Ligen gleichzeitig — verhindert Rate-Limiting beim Proxy */
+  const queue = [...LEAGUES];
+  const workers = Array(3).fill(null).map(async () => {
+    while (queue.length) {
+      const league = queue.shift();
+      if (league) await loadLeague(league, 1);
+    }
+  });
+  await Promise.all(workers);
 
   refreshBtn.disabled = false;
   refreshBtn.classList.remove('spinning');
