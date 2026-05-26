@@ -754,7 +754,7 @@ const leagueHtml = {};
 async function fetchURL(targetUrl) {
   const encoded = encodeURIComponent(targetUrl);
 
-  async function via(url, isJson, timeoutMs) {
+  async function tryProxy(url, isJson, timeoutMs) {
     const ctrl  = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
@@ -763,25 +763,27 @@ async function fetchURL(targetUrl) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       if (isJson) {
         const j = await res.json();
-        if (!j.contents || j.contents.length < 500) throw new Error('Zu kurz');
+        if (!j.contents || j.contents.length < 200) throw new Error('Zu kurz');
         return j.contents;
       }
       const t = await res.text();
-      if (t.length < 300) throw new Error('Zu kurz');
+      if (t.length < 200) throw new Error('Zu kurz');
       return t;
     } catch(e) { clearTimeout(timer); throw e; }
   }
 
-  /* Sequentieller Fallback: erst /get, dann /raw — kein paralleler Burst auf denselben Proxy */
+  /* Drei verschiedene Proxy-Dienste sequentiell — wenn allorigins geblockt ist, springt codetabs ein */
   const proxies = [
-    { url: 'https://api.allorigins.win/get?url=' + encoded, isJson: true  },
-    { url: 'https://api.allorigins.win/raw?url=' + encoded, isJson: false },
+    { url: 'https://api.allorigins.win/get?url=' + encoded,      isJson: true  },
+    { url: 'https://api.codetabs.com/v1/proxy?quest=' + encoded, isJson: false },
+    { url: 'https://api.allorigins.win/raw?url=' + encoded,      isJson: false },
   ];
   let lastErr;
   for (const p of proxies) {
-    try { return await via(p.url, p.isJson, 12000); } catch(e) { lastErr = e; }
+    try { return await tryProxy(p.url, p.isJson, 12000); }
+    catch(e) { lastErr = e; }
   }
-  throw new Error('Alle Proxies fehlgeschlagen');
+  throw new Error('Alle Proxies fehlgeschlagen (' + (lastErr?.message || '') + ')');
 }
 
 /* ── Parse ─────────────────────────────────────────────────── */
