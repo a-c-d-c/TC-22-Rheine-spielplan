@@ -584,19 +584,17 @@ function parseClubTeams(html) {
   const decoded = html.replace(/&amp;/g, '&');
   const re = /href="([^"]*groupPage[^"]*[?&]group=(\d+)[^"]*)">([^<]+)/g;
   const results = [];
-  let m, idx = 0;
+  const seenGroups = new Set();
+  let m;
   while ((m = re.exec(decoded)) !== null) {
     const relHref = m[1];
     const group   = m[2];
-    const label   = m[3].trim().replace(/\s+Gr\.\s*\d+.*$/i, '').trim();
-    const color   = [128, 128, 128]; // wird in applyLeagues überschrieben
-    results.push({
-      team:  'g' + group,
-      label,
-      url:   'https://wtv.liga.nu' + relHref,
-      color
-    });
-    idx++;
+    if (seenGroups.has(group)) continue; // Duplikate überspringen
+    seenGroups.add(group);
+    const label = m[3].trim().replace(/\s+Gr\.\s*\d+.*$/i, '').trim();
+    /* Absolute hrefs (andere Subdomain wie tvn.liga.nu) direkt verwenden */
+    const url = relHref.startsWith('http') ? relHref : 'https://wtv.liga.nu' + relHref;
+    results.push({ team: 'g' + group, label, url, color: [128, 128, 128] });
   }
   return results;
 }
