@@ -753,35 +753,35 @@ const leagueHtml = {};
 /* ── Fetch ─────────────────────────────────────────────────── */
 async function fetchURL(targetUrl) {
   const encoded = encodeURIComponent(targetUrl);
-  const ctrls   = [new AbortController(), new AbortController()];
 
-  async function via(idx, url, isJson) {
-    const timer = setTimeout(() => ctrls[idx].abort(), 10000);
+  async function via(url, isJson, timeoutMs) {
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
-      const res = await fetch(url, { signal: ctrls[idx].signal });
+      const res = await fetch(url, { signal: ctrl.signal });
       clearTimeout(timer);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       if (isJson) {
         const j = await res.json();
-        if (!j.contents || j.contents.length < 1000) throw new Error('Zu kurz');
+        if (!j.contents || j.contents.length < 500) throw new Error('Zu kurz');
         return j.contents;
       }
       const t = await res.text();
-      if (t.length < 500) throw new Error('Zu kurz');
+      if (t.length < 300) throw new Error('Zu kurz');
       return t;
     } catch(e) { clearTimeout(timer); throw e; }
   }
 
-  try {
-    const result = await Promise.any([
-      via(0, 'https://api.allorigins.win/get?url=' + encoded, true),
-      via(1, 'https://api.allorigins.win/raw?url=' + encoded, false),
-    ]);
-    ctrls.forEach(c => c.abort());
-    return result;
-  } catch {
-    throw new Error('Alle Proxies fehlgeschlagen');
+  /* Sequentieller Fallback: erst /get, dann /raw — kein paralleler Burst auf denselben Proxy */
+  const proxies = [
+    { url: 'https://api.allorigins.win/get?url=' + encoded, isJson: true  },
+    { url: 'https://api.allorigins.win/raw?url=' + encoded, isJson: false },
+  ];
+  let lastErr;
+  for (const p of proxies) {
+    try { return await via(p.url, p.isJson, 12000); } catch(e) { lastErr = e; }
   }
+  throw new Error('Alle Proxies fehlgeschlagen');
 }
 
 /* ── Parse ─────────────────────────────────────────────────── */
@@ -936,12 +936,15 @@ async function loadAllData() {
     }
   }
 
-  /* Max. 3 Ligen gleichzeitig — verhindert Rate-Limiting beim Proxy */
+  /* Max. 2 Ligen gleichzeitig + 600ms Pause — verhindert Rate-Limiting beim Proxy */
   const queue = [...LEAGUES];
-  const workers = Array(3).fill(null).map(async () => {
+  const workers = Array(2).fill(null).map(async () => {
     while (queue.length) {
       const league = queue.shift();
-      if (league) await loadLeague(league, 1);
+      if (league) {
+        await loadLeague(league, 1);
+        if (queue.length) await new Promise(r => setTimeout(r, 600));
+      }
     }
   });
   await Promise.all(workers);
