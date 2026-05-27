@@ -1245,7 +1245,7 @@ function renderMatches() {
       : '';
 
     return divider + `<div class="card ${teamCls}${extra}" ${cardClick}>
-  <div class="card-tag-row"><span class="tag ${tagCls}">${m.label}</span></div>
+  <div class="card-tag-row"><span class="tag ${tagCls}" onclick="event.stopPropagation();openMannschaften()" style="cursor:pointer">${m.label}</span></div>
   <div class="card-top">
     <span class="card-date">${wd} ${m.dateStr}<span class="card-time"> · ${m.timeStr}</span></span>
     ${past ? '' : `<span class="card-countdown" data-matchtime="${matchDateTime(m.date, m.timeStr).getTime()}">${countdownLabel(m.date, m.timeStr)}</span>`}
@@ -1297,6 +1297,11 @@ function applyStateToButtons() {
   });
   document.getElementById('btn-select-all').classList.toggle('on', selectMode === 'all');
   document.getElementById('btn-select-none').classList.toggle('on', selectMode === 'none');
+}
+
+function openMannschaften() {
+  const row = document.getElementById('team-row');
+  if (!row.classList.contains('visible')) toggleMannschaften();
 }
 
 function toggleMannschaften() {
