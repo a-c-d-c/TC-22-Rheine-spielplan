@@ -1103,9 +1103,9 @@ function renderNextMatch() {
     nl.textContent = ''; nl.className = 'nm-league';
     document.getElementById('nm-days').textContent   = '';
     document.getElementById('nm-unit').textContent   = '';
-    document.getElementById('nm-top-row').style.display    = 'none';
     const nmT = document.getElementById('nm-teams');
-    nmT.style.flex = '1'; nmT.style.flexDirection = 'column'; nmT.style.justifyContent = 'center'; nmT.style.marginTop = '0';
+    nmT.style.flexDirection = 'column'; nmT.style.justifyContent = 'center'; nmT.style.marginTop = '-3rem';
+    box.style.minHeight = '205px';
     box.classList.remove('home-game');
     box.style.display = 'flex';
     return;
@@ -1125,17 +1125,17 @@ function renderNextMatch() {
     nl2.textContent = ''; nl2.className = 'nm-league';
     document.getElementById('nm-days').textContent = '';
     document.getElementById('nm-unit').textContent = '';
-    document.getElementById('nm-top-row').style.display    = 'none';
     const nmT2 = document.getElementById('nm-teams');
-    nmT2.style.flex = '1'; nmT2.style.flexDirection = 'column'; nmT2.style.justifyContent = 'center'; nmT2.style.marginTop = '0';
+    nmT2.style.flexDirection = 'column'; nmT2.style.justifyContent = 'center'; nmT2.style.marginTop = '-3rem';
+    box.style.minHeight = '205px';
     box.classList.remove('home-game');
     box.style.display = 'flex';
     return;
   }
 
-  document.getElementById('nm-top-row').style.display = '';
   const nmTr = document.getElementById('nm-teams');
-  nmTr.style.flex = ''; nmTr.style.flexDirection = ''; nmTr.style.justifyContent = ''; nmTr.style.marginTop = '';
+  nmTr.style.flexDirection = ''; nmTr.style.justifyContent = ''; nmTr.style.marginTop = '';
+  box.style.minHeight = '';
   box.classList.toggle('home-game', next.isHome);
   clearTimeout(_homeBlinkTimer);
   const homeAwaySpan = next.isHome
