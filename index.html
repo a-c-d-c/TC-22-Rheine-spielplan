@@ -89,8 +89,11 @@
   #settings-overlay-section { margin-top: 20px; }
   .settings-theme-row { display: flex; gap: 8px; flex-wrap: wrap; }
   #settings-view .btn { font-size: 0.88rem; padding: 8px 16px; }
-  .settings-slider-row { display: flex; align-items: center; gap: 12px; margin: 8px 0 4px; padding: 24px 0; }
-  .settings-slider-row input[type=range] { flex: 1; cursor: pointer; accent-color: #8aadd4; height: 56px; }
+  .settings-slider-row { display: flex; align-items: center; gap: 12px; margin: 8px 0 4px; }
+  .custom-slider-wrap { flex: 1; height: 72px; display: flex; align-items: center; cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; }
+  .custom-slider-track { position: relative; width: 100%; height: 6px; background: rgba(144,149,176,0.22); border-radius: 3px; }
+  .custom-slider-fill { position: absolute; left: 0; top: 0; bottom: 0; background: #8aadd4; border-radius: 3px; pointer-events: none; }
+  .custom-slider-thumb { position: absolute; top: 50%; width: 30px; height: 30px; background: #8aadd4; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 8px rgba(0,0,0,0.45); pointer-events: none; }
   .settings-slider-lbl { color: #9095b0; font-size: 0.9rem; white-space: nowrap; }
   #settings-overlay-label { font-size: 2rem; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.08em; color: #fff; text-align: center; }
   .settings-close-row { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.07); }
@@ -995,7 +998,12 @@
       <div class="settings-section-label">Transparenz</div>
       <div class="settings-slider-row">
         <span class="settings-slider-lbl">0 %</span>
-        <input type="range" id="settings-overlay-slider" min="0" max="50" step="1" value="30" oninput="setOverlay(+this.value)">
+        <div class="custom-slider-wrap" id="settings-overlay-slider-wrap">
+          <div class="custom-slider-track">
+            <div class="custom-slider-fill" id="settings-overlay-fill" style="width:60%"></div>
+            <div class="custom-slider-thumb" id="settings-overlay-thumb" style="left:60%"></div>
+          </div>
+        </div>
         <span class="settings-slider-lbl">50 %</span>
       </div>
       <div id="settings-overlay-label">30 %</div>
@@ -1173,10 +1181,18 @@ function unlockBodyScroll() {
 }
 
 function initOverlays() {
-  const dark  = parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '0',  10);
+  const dark  = parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '30', 10);
   const light = parseInt(localStorage.getItem(LS_OVERLAY_LIGHT) || '30', 10);
   document.documentElement.style.setProperty('--overlay-dark',  (dark  / 100).toFixed(2));
   document.documentElement.style.setProperty('--overlay-light', (light / 100).toFixed(2));
+}
+
+function updateOverlaySliderUI(val) {
+  const pct = (val / 50) * 100;
+  const fill  = document.getElementById('settings-overlay-fill');
+  const thumb = document.getElementById('settings-overlay-thumb');
+  if (fill)  fill.style.width = pct + '%';
+  if (thumb) thumb.style.left = pct + '%';
 }
 
 function setOverlay(pct) {
@@ -1190,8 +1206,7 @@ function setOverlay(pct) {
   }
   const lbl = document.getElementById('settings-overlay-label');
   if (lbl) lbl.textContent = pct + ' %';
-  const slider = document.getElementById('settings-overlay-slider');
-  if (slider) slider.value = pct;
+  updateOverlaySliderUI(pct);
 }
 
 function updateSliderForTheme() {
@@ -1201,12 +1216,11 @@ function updateSliderForTheme() {
   if (theme === 'roland-garros') { section.style.display = 'none'; return; }
   section.style.display = '';
   const stored = theme === 'dark'
-    ? parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '0',  10)
+    ? parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '30', 10)
     : parseInt(localStorage.getItem(LS_OVERLAY_LIGHT) || '30', 10);
   const lbl = document.getElementById('settings-overlay-label');
   if (lbl) lbl.textContent = stored + ' %';
-  const slider = document.getElementById('settings-overlay-slider');
-  if (slider) slider.value = stored;
+  updateOverlaySliderUI(stored);
 }
 
 function updateSettingsThemeButtons() {
@@ -1217,6 +1231,26 @@ function updateSettingsThemeButtons() {
   });
   updateSliderForTheme();
 }
+
+(function initOverlaySlider() {
+  const wrap = document.getElementById('settings-overlay-slider-wrap');
+  if (!wrap) return;
+  function applyX(clientX) {
+    const rect = wrap.getBoundingClientRect();
+    const val = Math.round(Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) * 50);
+    setOverlay(val);
+  }
+  wrap.addEventListener('touchstart', e => { e.preventDefault(); applyX(e.touches[0].clientX); }, { passive: false });
+  wrap.addEventListener('touchmove',  e => { e.preventDefault(); applyX(e.touches[0].clientX); }, { passive: false });
+  let _drag = false;
+  wrap.addEventListener('mousedown', e => {
+    _drag = true; applyX(e.clientX);
+    const mv = e2 => { if (_drag) applyX(e2.clientX); };
+    const up = ()  => { _drag = false; document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); };
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
 
 function showSettings() {
   const sv = document.getElementById('settings-view');
