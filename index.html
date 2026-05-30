@@ -64,9 +64,9 @@
   }
   #settings-view {
     position: fixed;
-    top: var(--header-h, 80px);
-    left: max(16px, calc((100% - 608px) / 2));
-    right: max(16px, calc((100% - 608px) / 2));
+    top: calc(var(--header-h, 80px) + 8px);
+    left: max(32px, calc((100% - 576px) / 2));
+    right: max(32px, calc((100% - 576px) / 2));
     background: #0f1117;
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 14px;
@@ -74,7 +74,7 @@
     padding: 16px 18px 16px;
     z-index: 20;
     display: none;
-    animation: settings-appear 0.16s ease;
+    animation: settings-appear 1.5s ease;
   }
   @keyframes settings-appear {
     from { opacity: 0; transform: translateY(-8px); }
