@@ -74,18 +74,23 @@
     padding: 16px 18px 16px;
     z-index: 20;
     display: none;
-    animation: settings-appear 1.5s ease;
+    animation: settings-appear 1s ease;
   }
   @keyframes settings-appear {
     from { opacity: 0; transform: translateY(-8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  @keyframes settings-disappear {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-8px); }
+  }
+  #settings-view.is-closing { animation: settings-disappear 1s ease forwards; pointer-events: none; }
   .settings-section-label { font-size: 0.88rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #7a7f96; margin-bottom: 12px; }
   #settings-overlay-section { margin-top: 20px; }
   .settings-theme-row { display: flex; gap: 8px; flex-wrap: wrap; }
   #settings-view .btn { font-size: 0.88rem; padding: 8px 16px; }
-  .settings-slider-row { display: flex; align-items: center; gap: 12px; margin: 8px 0 4px; padding: 16px 0; }
-  .settings-slider-row input[type=range] { flex: 1; cursor: pointer; accent-color: #8aadd4; height: 44px; }
+  .settings-slider-row { display: flex; align-items: center; gap: 12px; margin: 8px 0 4px; padding: 24px 0; }
+  .settings-slider-row input[type=range] { flex: 1; cursor: pointer; accent-color: #8aadd4; height: 56px; }
   .settings-slider-lbl { color: #9095b0; font-size: 0.9rem; white-space: nowrap; }
   #settings-overlay-label { font-size: 2rem; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.08em; color: #fff; text-align: center; }
   .settings-close-row { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.07); }
@@ -1152,8 +1157,13 @@ const ROLAND_GARROS_CSS = `
 `;
 
 let _scrollY = 0;
+let _settingsCloseTimer = null;
 function lockBodyScroll() {
-  backFromSettings();
+  clearTimeout(_settingsCloseTimer);
+  const _sv = document.getElementById('settings-view');
+  _sv.style.display = 'none';
+  _sv.classList.remove('is-closing');
+  document.getElementById('settings-backdrop').style.display = 'none';
   _scrollY = window.scrollY;
   document.body.style.position = 'fixed';
   document.body.style.top = `-${_scrollY}px`;
@@ -1216,15 +1226,24 @@ function updateSettingsThemeButtons() {
 
 function showSettings() {
   const sv = document.getElementById('settings-view');
-  if (sv.style.display === 'block') { backFromSettings(); return; }
+  if (sv.style.display === 'block' && !sv.classList.contains('is-closing')) { backFromSettings(); return; }
+  clearTimeout(_settingsCloseTimer);
+  sv.classList.remove('is-closing');
   sv.style.display = 'block';
   document.getElementById('settings-backdrop').style.display = 'block';
   updateSettingsThemeButtons();
 }
 
 function backFromSettings() {
-  document.getElementById('settings-view').style.display = 'none';
+  const sv = document.getElementById('settings-view');
+  if (sv.style.display !== 'block') return;
+  clearTimeout(_settingsCloseTimer);
+  sv.classList.add('is-closing');
   document.getElementById('settings-backdrop').style.display = 'none';
+  _settingsCloseTimer = setTimeout(() => {
+    sv.style.display = 'none';
+    sv.classList.remove('is-closing');
+  }, 1000);
 }
 
 (function initSettingsSwipe() {
@@ -1448,11 +1467,9 @@ function buildTeamCSS(leagues, theme) {
   function toHex(rgb) { return '#' + rgb.map(x=>x.toString(16).padStart(2,'0')).join(''); }
   return leagues.map(l => {
     let [r,g,b] = l.color;
-    if (isLight) {
-      if (isJugend(l.label))            [r,g,b] = [  3, 42,122]; // Juniorinnen U18
-      else if (/damen/i.test(l.label))  [r,g,b] = [220, 80,130]; // Pink
-      else if (/herren/i.test(l.label)) [r,g,b] = [  3, 78, 22]; // Herren 55
-    }
+    if (isJugend(l.label))            [r,g,b] = [  3, 42,122];
+    else if (/damen/i.test(l.label))  [r,g,b] = [220, 80,130];
+    else if (/herren/i.test(l.label)) [r,g,b] = [  3, 78, 22];
     const br = Math.round(r*0.5+130), bg = Math.round(g*0.5+130), bb = Math.round(b*0.5+130);
     const bright  = '#' + [br,bg,bb].map(x=>Math.min(255,x).toString(16).padStart(2,'0')).join('');
     const cardBg  = toHex(blend(base, [r,g,b], 0.38));
@@ -2437,10 +2454,13 @@ function showTable(team) {
 }
 
 function backToList() {
+  clearTimeout(_settingsCloseTimer);
   document.getElementById('detail-view').style.display = 'none';
   document.getElementById('report-view').style.display = 'none';
   document.getElementById('info-view').style.display = 'none';
-  document.getElementById('settings-view').style.display = 'none';
+  const _sv2 = document.getElementById('settings-view');
+  _sv2.style.display = 'none';
+  _sv2.classList.remove('is-closing');
   document.getElementById('settings-backdrop').style.display = 'none';
   document.getElementById('matches-container').style.display = '';
   document.getElementById('update-info').style.display = '';
