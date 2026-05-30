@@ -950,27 +950,33 @@ const LIGHT_THEME_CSS = `
   .card::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
   .next-match-box { position: relative; isolation: isolate; }
   .next-match-box::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
-  .nm-league { position: relative; isolation: isolate; }
+  .nm-league { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5); }
   .nm-league::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
-  .card-tag-row .tag { position: relative; isolation: isolate; }
+  .card-tag-row .tag { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5); }
   .card-tag-row .tag::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
-  #team-btns-container .btn { position: relative; isolation: isolate; }
+  #team-btns-container .btn { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5); }
   #team-btns-container .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
-  .btn-filter { border-color: #b0b5cc; color: #3a3f60; }
-  .btn-filter.on { color: #1a1d2e; font-weight: 700; border-color: #5060a0; background: #c8cde4; }
-  .btn-mannschaften { color: #3a3f60; border-color: #b0b5cc; }
-  .btn-mannschaften.on { color: #1a1d2e; font-weight: 700; border-color: #5060a0; background: #c8cde4; animation: blink 1s step-end infinite; }
-  .mannschaften-wrapper.open { background: #eef0f8; border-color: #b0b5cc; }
+  .card-date { color: #ffffff; font-weight: 400; }
+  .card-time { color: #ffffff; font-weight: 400; }
+  .team { color: #ffffff; font-weight: 700; }
+  .team.opponent { color: #ffffff; font-weight: 400; }
+  .nm-date { color: #ffffff; font-weight: 400; }
+  .nm-match-teams span { color: #ffffff !important; }
+  .btn-filter { border-color: rgba(255,255,255,0.5); color: #3a3f60; }
+  .btn-filter.on { color: #1a1d2e; font-weight: 700; border-color: rgba(255,255,255,0.75); background: #c8cde4; }
+  .btn-mannschaften { color: #3a3f60; border-color: rgba(255,255,255,0.5); }
+  .btn-mannschaften.on { color: #1a1d2e; font-weight: 700; border-color: rgba(255,255,255,0.75); background: #c8cde4; animation: blink 1s step-end infinite; }
+  .mannschaften-wrapper.open { background: #eef0f8; border-color: rgba(255,255,255,0.5); }
   .mannschaften-wrapper.open .btn-mannschaften { border-color: transparent; background: rgba(60,70,140,0.07); color: #1a1d2e; }
-  .team-row.visible { background: #eef0f8; border-color: #b0b5cc; }
+  .team-row.visible { background: #eef0f8; border-color: rgba(255,255,255,0.5); }
   .team-row .btn { color: #3a3f60; }
-  .btn-close-teams { border-color: #b0b5cc; color: #3a3f60; }
-  .btn-select-all  { color: #3a3f60 !important; border-color: #b0b5cc !important; background: transparent !important; }
-  .btn-select-all.on  { color: #1a1d2e !important; font-weight: 700 !important; border-color: #5060a0 !important; background: #c8cde4 !important; }
-  .btn-select-none { color: #3a3f60 !important; border-color: #b0b5cc !important; background: transparent !important; }
-  .btn-select-none.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: #5060a0 !important; background: #c8cde4 !important; }
-  .btn-meine-auswahl { color: #3a3f60 !important; border-color: #b0b5cc !important; background: transparent !important; }
-  .btn-meine-auswahl.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: #5060a0 !important; background: #c8cde4 !important; }
+  .btn-close-teams { border-color: rgba(255,255,255,0.5); color: #3a3f60; }
+  .btn-select-all  { color: #3a3f60 !important; border-color: rgba(255,255,255,0.5) !important; background: transparent !important; }
+  .btn-select-all.on  { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(255,255,255,0.75) !important; background: #c8cde4 !important; }
+  .btn-select-none { color: #3a3f60 !important; border-color: rgba(255,255,255,0.5) !important; background: transparent !important; }
+  .btn-select-none.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(255,255,255,0.75) !important; background: #c8cde4 !important; }
+  .btn-meine-auswahl { color: #3a3f60 !important; border-color: rgba(255,255,255,0.5) !important; background: transparent !important; }
+  .btn-meine-auswahl.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(255,255,255,0.75) !important; background: #c8cde4 !important; }
   #info-view { background: #f0f2f8; }
   .btn-info { border-color: #5a6090; color: #3a3f60; background: rgba(60,70,140,0.08); }
   .info-content { color: #1a1d2e; }
