@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --overlay-alpha: 0.3; }
+  :root { --overlay-dark: 0; --overlay-light: 0.3; }
 
   html { background: #0f1117; }
   body {
@@ -104,7 +104,7 @@
     position: relative;
     isolation: isolate;
   }
-  .next-match-box::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(15,17,23,var(--overlay-alpha)); pointer-events: none; z-index: -1; }
+  .next-match-box::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   .nm-top-row {
     display: flex;
     justify-content: space-between;
@@ -164,7 +164,7 @@
     position: relative;
     isolation: isolate;
   }
-  .nm-league::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(15,17,23,var(--overlay-alpha)); pointer-events: none; z-index: -1; }
+  .nm-league::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   .nm-league:empty { display: none; }
   .nm-date { font-size: 0.88rem; color: #c8cae0; margin-top: 2px; }
   .nm-right { text-align: right; flex-shrink: 0; }
@@ -245,7 +245,7 @@
   .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
   #team-btns-container { display: flex; flex-direction: column; gap: 8px; }
   #team-btns-container .btn { position: relative; isolation: isolate; }
-  #team-btns-container .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(15,17,23,var(--overlay-alpha)); pointer-events: none; z-index: -1; }
+  #team-btns-container .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   .btn-close-teams { background: transparent; border: 1px solid #2e3150; border-radius: 20px; color: #555a7a; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 7px 0; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; width: 100%; margin-top: 4px; transition: all 0.15s; }
   .btn-select-all  { color: rgba(110,185,145,0.45) !important; border-color: rgba(110,185,145,0.22); }
   .btn-select-all.on  { color: #82c9a0 !important; border-color: #4a9068 !important; background: rgba(80,150,110,0.15) !important; font-weight: 700; }
@@ -279,7 +279,7 @@
     position: relative;
     isolation: isolate;
   }
-  .card::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(15,17,23,var(--overlay-alpha)); pointer-events: none; z-index: -1; }
+  .card::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   /* Karten-Farben werden dynamisch per JS generiert → siehe #dynamic-team-css */
   .card.home-game, #next-match-box.home-game { border-color: #fff !important; border-width: 2px; }
   .card.past-game .result {
@@ -696,7 +696,7 @@
     position: relative;
     isolation: isolate;
   }
-  .card-tag-row .tag::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(15,17,23,var(--overlay-alpha)); pointer-events: none; z-index: -1; }
+  .card-tag-row .tag::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   /* Tag-Farben werden dynamisch per JS generiert → siehe #dynamic-team-css */
 
   .btn-tabelle {
@@ -972,13 +972,15 @@
       <button class="btn btn-filter" id="btn-settings-theme-light"         onclick="setTheme('light')">Hell</button>
       <button class="btn btn-filter" id="btn-settings-theme-roland-garros" onclick="setTheme('roland-garros')">Roland Garros</button>
     </div>
-    <h3>Transparenz</h3>
-    <div class="settings-slider-row">
-      <span class="settings-slider-lbl">0 %</span>
-      <input type="range" id="settings-overlay-slider" min="0" max="75" step="1" value="30" oninput="setOverlay(+this.value)">
-      <span class="settings-slider-lbl">75 %</span>
+    <div id="settings-overlay-section">
+      <h3>Transparenz</h3>
+      <div class="settings-slider-row">
+        <span class="settings-slider-lbl">0 %</span>
+        <input type="range" id="settings-overlay-slider" min="0" max="75" step="1" value="30" oninput="setOverlay(+this.value)">
+        <span class="settings-slider-lbl">75 %</span>
+      </div>
+      <div id="settings-overlay-label">30 %</div>
     </div>
-    <div id="settings-overlay-label">30 %</div>
   </div>
 </div>
 
@@ -991,7 +993,8 @@ const LS_STATE       = 'rheine-state';
 const LS_AUSWAHL     = 'rheine-meine-auswahl';
 const LS_LEAGUES     = 'rheine-leagues-v6';
 const LS_THEME       = 'rheine-theme';
-const LS_OVERLAY     = 'spielplan-overlay';
+const LS_OVERLAY_DARK  = 'spielplan-overlay-dark';
+const LS_OVERLAY_LIGHT = 'spielplan-overlay-light';
 const LS_STARTS      = 'rheine-starts';
 
 const LIGHT_THEME_CSS = `
@@ -1005,14 +1008,14 @@ const LIGHT_THEME_CSS = `
   .nm-unit { color: #fff; }
   .next-match-box.no-match { background: #c8cde4; border-color: #5060a0; color: #1a1d2e; }
   .next-match-box.no-match .nm-label { color: #1a1d2e; font-weight: 700; }
-  .card::after { background: rgba(240,242,248,var(--overlay-alpha)); }
-  .next-match-box::after { background: rgba(240,242,248,var(--overlay-alpha)); }
+  .card::after { background: rgba(240,242,248,var(--overlay-light)); }
+  .next-match-box::after { background: rgba(240,242,248,var(--overlay-light)); }
   .nm-league { border-color: rgba(255,255,255,0.5) !important; }
-  .nm-league::after { background: rgba(240,242,248,var(--overlay-alpha)); }
+  .nm-league::after { background: rgba(240,242,248,var(--overlay-light)); }
   .card-tag-row .tag { border-color: rgba(255,255,255,0.5) !important; }
-  .card-tag-row .tag::after { background: rgba(240,242,248,var(--overlay-alpha)); }
+  .card-tag-row .tag::after { background: rgba(240,242,248,var(--overlay-light)); }
   #team-btns-container .btn { border-color: rgba(255,255,255,0.5) !important; }
-  #team-btns-container .btn::after { background: rgba(240,242,248,var(--overlay-alpha)); }
+  #team-btns-container .btn::after { background: rgba(240,242,248,var(--overlay-light)); }
   .card-date { color: #ffffff; font-weight: 400; }
   .card-time { color: #ffffff; font-weight: 400; }
   .team { color: #ffffff; font-weight: 700; }
@@ -1040,6 +1043,8 @@ const LIGHT_THEME_CSS = `
   .btn-settings { border-color: #5a6090; color: #3a3f60; background: rgba(60,70,140,0.08); }
   .settings-content { color: #1a1d2e; }
   .settings-content h3 { color: #0f1020; }
+  #settings-overlay-label { color: #1a1d2e; }
+  .settings-slider-lbl { color: #3a3f60; }
   .info-content { color: #1a1d2e; }
   .info-content h2 { color: #0f1020; }
   #donate-banner { background: rgba(0,48,135,0.06); border-color: rgba(0,112,186,0.25); }
@@ -1092,11 +1097,7 @@ const ROLAND_GARROS_CSS = `
   .btn-select-none.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
   .btn-meine-auswahl { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
   .btn-meine-auswahl.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
-  .card::after { background: rgba(100,37,8,var(--overlay-alpha)); }
-  .next-match-box::after { background: rgba(100,37,8,var(--overlay-alpha)); }
-  .nm-league::after { background: rgba(100,37,8,var(--overlay-alpha)); }
-  .card-tag-row .tag::after { background: rgba(100,37,8,var(--overlay-alpha)); }
-  #team-btns-container .btn::after { background: rgba(100,37,8,var(--overlay-alpha)); }
+  .card::after, .next-match-box::after, .nm-league::after, .card-tag-row .tag::after, #team-btns-container .btn::after { background: transparent; }
   #info-view { background: #642508; }
   #settings-view { background: #642508; }
   .btn-info { border-color: rgba(255,255,255,0.5); color: #ffffff; background: rgba(255,255,255,0.1); }
@@ -1140,13 +1141,41 @@ function unlockBodyScroll() {
   window.scrollTo(0, _scrollY);
 }
 
+function initOverlays() {
+  const dark  = parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '0',  10);
+  const light = parseInt(localStorage.getItem(LS_OVERLAY_LIGHT) || '30', 10);
+  document.documentElement.style.setProperty('--overlay-dark',  (dark  / 100).toFixed(2));
+  document.documentElement.style.setProperty('--overlay-light', (light / 100).toFixed(2));
+}
+
 function setOverlay(pct) {
-  document.documentElement.style.setProperty('--overlay-alpha', (pct / 100).toFixed(2));
-  localStorage.setItem(LS_OVERLAY, pct);
+  const theme = localStorage.getItem(LS_THEME) || 'dark';
+  if (theme === 'dark') {
+    document.documentElement.style.setProperty('--overlay-dark', (pct / 100).toFixed(2));
+    localStorage.setItem(LS_OVERLAY_DARK, pct);
+  } else if (theme === 'light') {
+    document.documentElement.style.setProperty('--overlay-light', (pct / 100).toFixed(2));
+    localStorage.setItem(LS_OVERLAY_LIGHT, pct);
+  }
   const lbl = document.getElementById('settings-overlay-label');
   if (lbl) lbl.textContent = pct + ' %';
   const slider = document.getElementById('settings-overlay-slider');
   if (slider) slider.value = pct;
+}
+
+function updateSliderForTheme() {
+  const theme   = localStorage.getItem(LS_THEME) || 'dark';
+  const section = document.getElementById('settings-overlay-section');
+  if (!section) return;
+  if (theme === 'roland-garros') { section.style.display = 'none'; return; }
+  section.style.display = '';
+  const stored = theme === 'dark'
+    ? parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '0',  10)
+    : parseInt(localStorage.getItem(LS_OVERLAY_LIGHT) || '30', 10);
+  const lbl = document.getElementById('settings-overlay-label');
+  if (lbl) lbl.textContent = stored + ' %';
+  const slider = document.getElementById('settings-overlay-slider');
+  if (slider) slider.value = stored;
 }
 
 function updateSettingsThemeButtons() {
@@ -1155,6 +1184,7 @@ function updateSettingsThemeButtons() {
     const btn = document.getElementById('btn-settings-theme-' + t);
     if (btn) btn.classList.toggle('on', theme === t);
   });
+  updateSliderForTheme();
 }
 
 function showSettings() {
@@ -1170,7 +1200,6 @@ function showSettings() {
   lockBodyScroll();
   document.getElementById('settings-view').style.display = 'block';
   updateSettingsThemeButtons();
-  setOverlay(parseInt(localStorage.getItem(LS_OVERLAY) || '30', 10));
 }
 
 function backFromSettings() {
@@ -2738,7 +2767,7 @@ function updateHeaderH() {
 }
 
 setTheme(localStorage.getItem(LS_THEME) || 'light');
-setOverlay(parseInt(localStorage.getItem(LS_OVERLAY) || '30', 10));
+initOverlays();
 updateHeaderH();
 document.fonts.ready.then(updateHeaderH);
 window.addEventListener('resize', updateHeaderH);
