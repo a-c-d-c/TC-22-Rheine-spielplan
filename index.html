@@ -950,11 +950,11 @@ const LIGHT_THEME_CSS = `
   .card::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
   .next-match-box { position: relative; isolation: isolate; }
   .next-match-box::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
-  .nm-league { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5); }
+  .nm-league { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5) !important; }
   .nm-league::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
-  .card-tag-row .tag { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5); }
+  .card-tag-row .tag { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5) !important; }
   .card-tag-row .tag::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
-  #team-btns-container .btn { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5); }
+  #team-btns-container .btn { position: relative; isolation: isolate; border-color: rgba(255,255,255,0.5) !important; }
   #team-btns-container .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(240,242,248,0.5); pointer-events: none; z-index: -1; }
   .card-date { color: #ffffff; font-weight: 400; }
   .card-time { color: #ffffff; font-weight: 400; }
@@ -1190,6 +1190,7 @@ function setTheme(theme) {
   if (btnLight) btnLight.classList.toggle('on',  theme === 'light');
   if (btnRG)    btnRG.classList.toggle('on',     theme === 'roland-garros');
   localStorage.setItem(LS_THEME, theme);
+  if (LEAGUES.length) document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES, theme);
 }
 
 // Kategorie-Paletten — hell → dunkel (jung → alt)
@@ -1266,14 +1267,20 @@ function parseClubTeams(html) {
   return results;
 }
 
-function buildTeamCSS(leagues) {
+function buildTeamCSS(leagues, theme) {
   const base = [18, 22, 42];
+  const isLight = theme === 'light';
   function blend(base, team, a) {
     return base.map((v,i) => Math.min(255, Math.round(v*(1-a) + team[i]*a)));
   }
   function toHex(rgb) { return '#' + rgb.map(x=>x.toString(16).padStart(2,'0')).join(''); }
   return leagues.map(l => {
-    const [r,g,b] = l.color;
+    let [r,g,b] = l.color;
+    if (isLight) {
+      if (isJugend(l.label))            [r,g,b] = [  3, 42,122]; // Juniorinnen U18
+      else if (/damen/i.test(l.label))  [r,g,b] = [138,130,158]; // Pington
+      else if (/herren/i.test(l.label)) [r,g,b] = [  3, 78, 22]; // Herren 55
+    }
     const br = Math.round(r*0.5+130), bg = Math.round(g*0.5+130), bb = Math.round(b*0.5+130);
     const bright  = '#' + [br,bg,bb].map(x=>Math.min(255,x).toString(16).padStart(2,'0')).join('');
     const cardBg  = toHex(blend(base, [r,g,b], 0.38));
@@ -1405,7 +1412,7 @@ function applyLeagues() {
   spreadColors(LEAGUES.filter(gemischtAdult),               PALETTE_GEMISCHT);
   LEAGUES.filter(l => !isJugend(l.label) && !/damen|herren/i.test(l.label) && !gemischtAdult(l))
          .forEach(l => l.color = PALETTE_JUGEND[0]);
-  document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES);
+  document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES, localStorage.getItem(LS_THEME) || 'dark');
   LEAGUES.forEach(l => { if (showTeams[l.team] === undefined) showTeams[l.team] = true; });
   buildTeamButtons();
   applyStateToButtons();
