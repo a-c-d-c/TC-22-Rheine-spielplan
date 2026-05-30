@@ -525,7 +525,6 @@
       flex-shrink: 0;
     }
   }
-  .info-theme-row { margin-left: auto; display: flex; gap: 8px; }
   #btn-info-back { color: #ffffff !important; }
   #info-donate {
     margin: 48px 0 0;
@@ -960,11 +959,6 @@
 <div id="info-view">
   <div class="detail-header">
     <button class="btn btn-filter on" id="btn-info-back" onclick="backToList()">Zurück</button>
-    <div class="info-theme-row">
-      <button class="btn btn-filter" id="btn-info-theme-dark"  onclick="setTheme('dark')">Dunkel</button>
-      <button class="btn btn-filter" id="btn-info-theme-light" onclick="setTheme('light')">Hell</button>
-      <button class="btn btn-filter" id="btn-info-theme-roland-garros" onclick="setTheme('roland-garros')">Roland Garros</button>
-    </div>
   </div>
   <div class="info-content" id="info-content"></div>
   <div id="info-donate">
@@ -1001,8 +995,8 @@
       <div class="settings-section-label">Transparenz</div>
       <div class="settings-slider-row">
         <span class="settings-slider-lbl">0 %</span>
-        <input type="range" id="settings-overlay-slider" min="0" max="75" step="1" value="30" oninput="setOverlay(+this.value)">
-        <span class="settings-slider-lbl">75 %</span>
+        <input type="range" id="settings-overlay-slider" min="0" max="50" step="1" value="30" oninput="setOverlay(+this.value)">
+        <span class="settings-slider-lbl">50 %</span>
       </div>
       <div id="settings-overlay-label">30 %</div>
     </div>
@@ -1373,12 +1367,6 @@ function setTheme(theme) {
   document.getElementById('theme-override-css').textContent = css;
   const metaColor = theme === 'light' ? '#f0f2f8' : theme === 'roland-garros' ? '#642508' : '#0f1117';
   document.querySelector('meta[name="theme-color"]').content = metaColor;
-  const btnDark  = document.getElementById('btn-info-theme-dark');
-  const btnLight = document.getElementById('btn-info-theme-light');
-  const btnRG    = document.getElementById('btn-info-theme-roland-garros');
-  if (btnDark)  btnDark.classList.toggle('on',  theme === 'dark');
-  if (btnLight) btnLight.classList.toggle('on',  theme === 'light');
-  if (btnRG)    btnRG.classList.toggle('on',     theme === 'roland-garros');
   localStorage.setItem(LS_THEME, theme);
   if (LEAGUES.length) document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES, theme);
   updateSettingsThemeButtons();
